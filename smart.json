@@ -1,0 +1,9 @@
+{
+  "name": "map-locator",
+  "description": "Plugin for address lookup that formats an address, grabs coordinates and allows users to shift an address by moving a dropped pin.",
+  "homepage": "https://github.com/em0ney/meteor-mapLocator",
+  "author": "Elliott Spira <elliottspira.com>",
+  "version": "0.0.1",
+  "git": "https://github.com/em0ney/meteor-mapLocator.git",
+  "packages": {}
+}

@@ -5,6 +5,7 @@ GoogleMapLocator = {
       options = {};
     }
     GoogleMapLocator.api_key = api_key || '';
+    GoogleMapLocator.region = options.region || 'au';
     GoogleMapLocator.lat = options.lat || -33.867791;
     GoogleMapLocator.lng = options.lng || 151.20774900000004;
     GoogleMapLocator.initialZoom = options.initialZoom || 12;
@@ -41,6 +42,7 @@ GoogleMapLocator = {
     var address = $("input[name=address]").val();
     geocoder.geocode( { 'address': address }, function(results, status) {
       if (status == google.maps.GeocoderStatus.OK) {
+        console.log(results);
         position = results[0].geometry.location;
         map.setCenter(position);
         map.setZoom(GoogleMapLocator.focusedZoom);
@@ -127,7 +129,7 @@ if (Meteor.isClient) {
   Template.map_canvas.rendered = function() {
     $('<script>', {
       type: 'text/javascript',
-      src: "https://maps.googleapis.com/maps/api/js?key=" + GoogleMapLocator.api_key + "&sensor=true&callback=GoogleMapLocator.initializeMap"
+      src: "https://maps.googleapis.com/maps/api/js?key=" + GoogleMapLocator.api_key + "&region=" + GoogleMapLocator.region +  "&sensor=true&callback=GoogleMapLocator.initializeMap"
     }).appendTo('body');
     var map, geocoder, marker;
   };

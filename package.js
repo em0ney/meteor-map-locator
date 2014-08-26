@@ -1,5 +1,5 @@
 Package.describe({
-  summary: "Plugin for address lookup that formats an address, grabs coordinates and allows users to shift an address by moving a dropped pin."
+  summary: "Plugin for geocoding (address lookup) that formats an address, grabs coordinates and allows users to shift an address by moving a dropped pin."
 });
 
 Package.on_use(function (api) {

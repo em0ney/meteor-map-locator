@@ -1,6 +1,6 @@
 ## Overview 
 
-This is a meteorite package to provide a map canvas and search field to the user.  Using the search field, search for an address and have the geolocation code format this address for you.  Then either drag a dropped pin to change the address, or amend the search.
+This is a meteorite package to provide geocoding through a map canvas and search field.  Using the search field, search for an address and have google format this address for you.  Then either drag a dropped pin to change the address, or amend the search.
 
 A structured JSON document of the diffrent address components and the latitude and langitude are stored in hidden fields as well.
 
@@ -18,6 +18,7 @@ To access google maps, you will at least need to provide your [google maps API k
     
     // defaults
     options = {
+       region: 'au', /* Region biasing.  Set to your ccTLD */
        lat: -33.867791,
        lng: 151.20774900000004,
        initialZoom: 12, /* Initial zoom on map */

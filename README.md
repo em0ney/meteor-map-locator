@@ -27,11 +27,11 @@ To access google maps, you will at least need to provide your [google maps API k
 Example usage:
 
     if (Meteor.isClient) {
-    	Meteor.startup = function() {
+    	Meteor.startup(function() {
     		GoogleMapLocator.init('YOUR-API-KEY');
     		// OR
     		GoogleMapLocator.init('YOUR-API-KEY', {lat:33.12738, lng: 151.20277});    		
-    	};
+    	});
     }
 
 #### Include map canvas and search fields

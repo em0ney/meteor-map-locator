@@ -9,8 +9,8 @@ Package.on_use(function (api) {
   // Can add files individually or as an array argument
   // Demo - show how to add less
   api.add_files([
-    'client/google_map_locator.js',
-    'client/google_map_locate.html'
+    'client/google_map_locate.html',
+    'client/google_map_locator.js'
   ], 'client');
 
   // api.add_files('server/boot.js', 'server');

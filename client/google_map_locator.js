@@ -13,7 +13,7 @@ GoogleMapLocator = {
   initializeMap: function() {
     var mapOptions = {
       zoom: GoogleMapLocator.initialZoom,
-      center: new google.maps.LatLng(GoogleMapLocator.lat, GoogleMapLocator.lng);
+      center: new google.maps.LatLng(GoogleMapLocator.lat, GoogleMapLocator.lng)
     };
     geocoder = new google.maps.Geocoder();
     map = new google.maps.Map(document.getElementById('map-canvas'),

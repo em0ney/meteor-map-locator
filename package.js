@@ -1,5 +1,6 @@
 Package.describe({
   summary: "Plugin for geocoding (address lookup) that allows users to shift an address with a pin.",
+  git: "https://github.com/em0ney/meteor-map-locator.git",
   version: "0.0.1"
 });
 

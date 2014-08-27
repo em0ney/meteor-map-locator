@@ -1,9 +1,9 @@
 {
-  "name": "map-locator",
+  "name": "em0ney:map-locator",
   "description": "Plugin for geocoding (address lookup) that allows users to shift an address with a pin.",
-  "homepage": "https://github.com/em0ney/meteor-mapLocator",
+  "homepage": "https://github.com/em0ney/meteor-map-locator",
   "author": "Elliott Spira <elliottspira.com>",
   "version": "0.0.1",
-  "git": "https://github.com/em0ney/meteor-mapLocator.git",
+  "git": "https://github.com/em0ney/meteor-map-locator.git",
   "packages": {}
 }

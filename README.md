@@ -6,6 +6,9 @@ A structured JSON document of the diffrent address components and the latitude a
 
 ## Installation
 
+Meteor0.9 and later - `meteor add em0ney:map-locator`
+
+Pre-0.9 (using meteorite)
 Install by typing `mrt add map-locator`
 
 ## Usage

@@ -1,4 +1,5 @@
 var map, geocoder, marker;
+
 GoogleMapLocator = {
   init: function(api_key, options) {
     if (options === undefined) {
@@ -10,13 +11,19 @@ GoogleMapLocator = {
     GoogleMapLocator.lng = options.lng || 151.20774900000004;
     GoogleMapLocator.initialZoom = options.initialZoom || 12;
     GoogleMapLocator.focusedZoom = options.initialZoom || 17;
+    $('<script>', {
+      type: 'text/javascript',
+      src: "https://maps.googleapis.com/maps/api/js?key=" + GoogleMapLocator.api_key + "&region=" + GoogleMapLocator.region +  "&sensor=true&callback=GoogleMapLocator.initializeVars" //&callback=GoogleMapLocator.initializeMap
+    }).appendTo('body');
+  },
+  initializeVars: function() {
+    geocoder = new google.maps.Geocoder();
   },
   initializeMap: function() {
     var mapOptions = {
       zoom: GoogleMapLocator.initialZoom,
       center: new google.maps.LatLng(GoogleMapLocator.lat, GoogleMapLocator.lng)
     };
-    geocoder = new google.maps.Geocoder();
     map = new google.maps.Map(document.getElementById('map-canvas'),
         mapOptions);
     if (! $("input[name=lat]").val()) {
@@ -62,6 +69,27 @@ GoogleMapLocator = {
         alert("Geocode was not successful for the following reason: " + status);
       }
     });
+  },
+
+  reverseGeocode: function(location) {
+    check(location, {lat: Number, lng: Number});
+    if (typeof(geocoder) === "undefined") {
+      geocoder = new google.maps.Geocoder();
+    }
+    var latlng = new google.maps.LatLng(location.lat, location.lng);
+    geocoder.geocode({'latLng': latlng}, function(results, status) {
+      if (status === google.maps.GeocoderStatus.OK) {
+        if (results.length > 0) {
+          console.log(results[1].formatted_address);
+          console.log(results);
+        } else {
+          console.log('No reverse geocode results found');
+        }
+      } else {
+        console.log('Geocoder failed due to: ' + status);
+      }
+    });
+    return results;
   },
 
   recordAddressComponents: function(results) {
@@ -111,26 +139,21 @@ GoogleMapLocator = {
 
 };
 
-if (Meteor.isClient) {
-  Template.map_locate_fields.events({
-    'click button.geolocate' : function(e, tpl) {
-      e.preventDefault();
-      return GoogleMapLocator.codeAddress(false);
-    },
-    'blur input[name=address]' : function(e) {
-      // Ignore blur where user picks up the marker off the map (otherwise we duplicate marker)
-      if ($("input[name=address]").val()) {
-        return GoogleMapLocator.codeAddress(true);
-      }
+
+Template.map_locate_fields.events({
+  'click button.geolocate' : function(e, tpl) {
+    e.preventDefault();
+    return GoogleMapLocator.codeAddress(false);
+  },
+  'blur input[name=address]' : function(e) {
+    // Ignore blur where user picks up the marker off the map (otherwise we duplicate marker)
+    if ($("input[name=address]").val()) {
+      return GoogleMapLocator.codeAddress(true);
     }
+  }
 
-  });
+});
 
-  Template.map_canvas.rendered = function() {
-    $('<script>', {
-      type: 'text/javascript',
-      src: "https://maps.googleapis.com/maps/api/js?key=" + GoogleMapLocator.api_key + "&region=" + GoogleMapLocator.region +  "&sensor=true&callback=GoogleMapLocator.initializeMap"
-    }).appendTo('body');
-    var map, geocoder, marker;
-  };
-}
+Template.map_canvas.rendered = function() {
+  GoogleMapLocator.initializeMap();
+};

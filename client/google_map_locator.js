@@ -1,38 +1,67 @@
 var map, geocoder, marker;
-
+var defaults = {
+  api_key: '',
+  region: 'au',
+  defaultLat: -33.867791,
+  defaultLng: 151.20774900000004,
+  initialZoom: 12,
+  focusedZoom: 17,
+  renderedDelay: 0,
+  address_components: {}
+};
 GoogleMapLocator = {
+  callbacks: [],
+
   init: function(api_key, options) {
     if (options === undefined) {
       options = {};
     }
-    GoogleMapLocator.api_key = api_key || '';
-    GoogleMapLocator.region = options.region || 'au';
-    GoogleMapLocator.lat = options.lat || -33.867791;
-    GoogleMapLocator.lng = options.lng || 151.20774900000004;
-    GoogleMapLocator.initialZoom = options.initialZoom || 12;
-    GoogleMapLocator.focusedZoom = options.initialZoom || 17;
-    $('<script>', {
-      type: 'text/javascript',
-      src: "https://maps.googleapis.com/maps/api/js?key=" + GoogleMapLocator.api_key + "&region=" + GoogleMapLocator.region +  "&sensor=true&callback=GoogleMapLocator.initializeVars" //&callback=GoogleMapLocator.initializeMap
-    }).appendTo('body');
+    options.api_key = api_key;
+    options = _.defaults(options, defaults);
+    _.each(options, function(value, key) {
+      GoogleMapLocator[key] = value;
+    });
+    /* Set up default callbacks */
+    GoogleMapLocator.callbacks.push(GoogleMapLocator.initializeVars); // should go first
   },
+
+  initialize: function(callback) {
+    if (typeof(window.google) === "undefined") {
+      if (_.isFunction(callback) && !_.contains(GoogleMapLocator.callbacks, callback)) {
+        GoogleMapLocator.callbacks.push(callback);
+      }
+      $('<script>', {
+        type: 'text/javascript',
+        src: "https://maps.googleapis.com/maps/api/js?key=" + GoogleMapLocator.api_key + "&region=" + GoogleMapLocator.region + "&sensor=true&callback=GoogleMapLocator.mapsCallback"
+      }).appendTo('body');
+    } else {
+      callback();  
+    }
+  },
+
+  mapsCallback: function() {
+    _.each(GoogleMapLocator.callbacks, function(fn) {
+      fn();
+    });
+  },
+
   initializeVars: function() {
     geocoder = new google.maps.Geocoder();
   },
+
   initializeMap: function() {
     var mapOptions = {
       zoom: GoogleMapLocator.initialZoom,
-      center: new google.maps.LatLng(GoogleMapLocator.lat, GoogleMapLocator.lng)
+      center: new google.maps.LatLng(GoogleMapLocator.defaultLat, GoogleMapLocator.defaultLng)
     };
-    map = new google.maps.Map(document.getElementById('map-canvas'),
-        mapOptions);
-    if (! $("input[name=lat]").val()) {
+    map = new google.maps.Map(document.getElementById('map-canvas'), mapOptions);
+    if (! GoogleMapLocator.lng) {
       marker = null;
     } else {
       position = {
-        lat: parseFloat($("input[name=lat]").val()),
-        lng: parseFloat($("input[name=lng]").val())
-      }
+        lat: GoogleMapLocator.lat,
+        lng: GoogleMapLocator.lng
+      };
       map.setCenter(position);
       map.setZoom(GoogleMapLocator.focusedZoom);
       marker = new google.maps.Marker({
@@ -45,11 +74,16 @@ GoogleMapLocator = {
     }
   },
 
+  setLocation: function(location) {
+    check(location, {lat: Number, lng: Number});
+    GoogleMapLocator.lat = location.lat;
+    GoogleMapLocator.lng = location.lng;
+  },
+
   codeAddress: function(fromBlur) {
     var address = $("input[name=address]").val();
     geocoder.geocode( { 'address': address }, function(results, status) {
       if (status == google.maps.GeocoderStatus.OK) {
-        console.log(results);
         position = results[0].geometry.location;
         map.setCenter(position);
         map.setZoom(GoogleMapLocator.focusedZoom);
@@ -58,7 +92,7 @@ GoogleMapLocator = {
         } else {
           marker = new google.maps.Marker({
             map: map,
-            draggable:true,
+            draggable: true,
             animation: google.maps.Animation.DROP,
             position: position
           });
@@ -71,7 +105,7 @@ GoogleMapLocator = {
     });
   },
 
-  reverseGeocode: function(location) {
+  reverseGeocode: function(location, success_callback) {
     check(location, {lat: Number, lng: Number});
     if (typeof(geocoder) === "undefined") {
       geocoder = new google.maps.Geocoder();
@@ -80,8 +114,12 @@ GoogleMapLocator = {
     geocoder.geocode({'latLng': latlng}, function(results, status) {
       if (status === google.maps.GeocoderStatus.OK) {
         if (results.length > 0) {
-          console.log(results[1].formatted_address);
-          console.log(results);
+          if (_.isUndefined(success_callback)) {
+            console.log("no success callback defined, dumping results");
+            console.log(results);
+          } else {
+            success_callback(results);
+          }
         } else {
           console.log('No reverse geocode results found');
         }
@@ -89,13 +127,12 @@ GoogleMapLocator = {
         console.log('Geocoder failed due to: ' + status);
       }
     });
-    return results;
   },
 
   recordAddressComponents: function(results) {
     position = results[0].geometry.location;
-    $("input[name=lat]").val(position.lat());
-    $("input[name=lng]").val(position.lng());
+    GoogleMapLocator.lat = position.lat();
+    GoogleMapLocator.lng = position.lng();
     $("input[name=address]").val(results[0].formatted_address);
     GoogleMapLocator.parseAddressComponents(results[0].address_components);
   },
@@ -111,7 +148,7 @@ GoogleMapLocator = {
         "value_long": value_long
       };
     });
-    $("input[name=address_components]").val(JSON.stringify(components));
+    GoogleMapLocator.address_components = components;
   },
 
   codePosition: function(position) {
@@ -131,12 +168,7 @@ GoogleMapLocator = {
     google.maps.event.addListener(marker, 'dragend', function() {
       GoogleMapLocator.codePosition(marker.getPosition());
     });
-  },
-
-  getAddressComponents: function(form) {
-    return JSON.parse($(form.find('[name=address_components]')).val());
   }
-
 };
 
 
@@ -151,9 +183,20 @@ Template.map_locate_fields.events({
       return GoogleMapLocator.codeAddress(true);
     }
   }
-
 });
 
 Template.map_canvas.rendered = function() {
-  GoogleMapLocator.initializeMap();
+  if (GoogleMapLocator.renderedDelay > 0) {
+    window.setTimeout(function() {
+      GoogleMapLocator.initialize(GoogleMapLocator.initializeMap);
+    }, GoogleMapLocator.renderedDelay);
+  } else {
+    GoogleMapLocator.initialize(GoogleMapLocator.initializeMap);
+  }
+};
+
+Template.map_canvas.destroyed = function () {
+  GoogleMapLocator.renderedDelay = 0;
+  GoogleMapLocator.lat = null;
+  GoogleMapLocator.lng = null;
 };

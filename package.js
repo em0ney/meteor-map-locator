@@ -1,19 +1,21 @@
 Package.describe({
-  summary: "Plugin for geocoding (address lookup) that allows users to shift an address with a pin.",
+  summary: "Google maps geocoding, reverse geocoding and address selection by shifting a pin.",
   git: "https://github.com/em0ney/meteor-map-locator.git",
-  version: "0.0.2"
+  version: "0.1.0"
 });
 
 Package.on_use(function (api) {
   // Templating makes the templates defined in googe_map_locate.html available outside
   api.use([
     'templating@1.0.4',
-    'check'
+    'check',
+    'underscore'
   ], 'client');
 
   // Can add files individually or as an array argument
   // Demo - show how to add less
   api.add_files([
+    'client/google_map_locate.css',
     'client/google_map_locate.html',
     'client/google_map_locator.js'
   ], 'client');

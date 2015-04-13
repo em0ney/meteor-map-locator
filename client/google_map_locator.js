@@ -9,8 +9,15 @@ var defaults = {
   renderedDelay: 0,
   address_components: {}
 };
+var isKeyCodeAlphaNumeric = function(event) {
+  var code = event.code || event.which;
+  return ((code >= 65 && code <= 90) 
+      || (code >= 97 && code <= 122)
+      || (code >= 48 && code <= 57));
+};
 GoogleMapLocator = {
   callbacks: [],
+  results: [],
 
   init: function(api_key, options) {
     if (options === undefined) {
@@ -105,7 +112,7 @@ GoogleMapLocator = {
     });
   },
 
-  reverseGeocode: function(location, success_callback) {
+  reverseGeocode: function(location, success_callback, failure_callback) {
     check(location, {lat: Number, lng: Number});
     if (typeof(geocoder) === "undefined") {
       geocoder = new google.maps.Geocoder();
@@ -124,7 +131,11 @@ GoogleMapLocator = {
           console.log('No reverse geocode results found');
         }
       } else {
-        console.log('Geocoder failed due to: ' + status);
+        if (_.isUndefined(failure_callback)) {
+          console.log('Geocoder failed due to: ' + status);
+        } else {
+          failure_callback(status);
+        }
       }
     });
   },
@@ -171,6 +182,11 @@ GoogleMapLocator = {
   }
 };
 
+Template.map_locate_fields.helpers({
+  'addresses': function() {
+    return Session.get('address_results') || [];
+  }
+});
 
 Template.map_locate_fields.events({
   'click button.geolocate' : function(e, tpl) {
@@ -184,6 +200,7 @@ Template.map_locate_fields.events({
     }
   }
 });
+
 
 Template.map_canvas.rendered = function() {
   if (GoogleMapLocator.renderedDelay > 0) {
@@ -200,3 +217,4 @@ Template.map_canvas.destroyed = function () {
   GoogleMapLocator.lat = null;
   GoogleMapLocator.lng = null;
 };
+

@@ -67,10 +67,17 @@ To show a map with an address set, simply set `GoogleMapLocator.lat` and `Google
 
       /* Don't worry, these settings are reset each time that the map_canvas template is destroyed, so will not bleed between templates */
     };
-    
-#### Read different fields
 
-When dealing with a form submission, pass the form element or the whole template into the honeypot ishuman function:
+### Methods
 
-    GoogleMapLocator.getAddressComponents(form);
-    
+##### reverseGeocode
+reverseGeocode: function(location, success_callback, failure_callback) {}
+
+reverseGeocode takes a location `{lat: Number, lng: Number}`, a success function that receives a single argument, a list of results and a failure function that receives a String error message.
+
+
+
+
+  
+
+

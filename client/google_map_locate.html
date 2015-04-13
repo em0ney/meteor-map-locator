@@ -1,7 +1,7 @@
 <template name="map_locate_fields">
   <div class="form-group">
     <label>Address</label>
-    <input name="address" type="text" class="form-control" placeholder="search for address" />
+    <input name="address" type="text" class="form-control typeahead" placeholder="search for address" autocomplete="off" spellcheck="off" data-source="addresses"/>
     <br>
     <button class="geolocate btn btn-default">Locate</button>
   </div>

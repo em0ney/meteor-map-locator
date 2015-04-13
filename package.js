@@ -8,8 +8,8 @@ Package.on_use(function (api) {
   // Templating makes the templates defined in googe_map_locate.html available outside
   api.use([
     'templating@1.0.4',
-    'check',
-    'underscore'
+    'check@1.0.5',
+    'underscore@1.0.3'
   ], 'client');
 
   // Can add files individually or as an array argument

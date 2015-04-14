@@ -1,7 +1,7 @@
 Package.describe({
   summary: "Google maps geocoding, reverse geocoding and address selection by shifting a pin.",
   git: "https://github.com/em0ney/meteor-map-locator.git",
-  version: "0.1.0"
+  version: "0.1.1"
 });
 
 Package.on_use(function (api) {

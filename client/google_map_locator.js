@@ -112,6 +112,10 @@ GoogleMapLocator = {
     });
   },
 
+  codeAddressString: function(address, callback) {
+    geocoder.geocode( { 'address': address }, callback);
+  },
+
   reverseGeocode: function(location, success_callback, failure_callback) {
     check(location, {lat: Number, lng: Number});
     if (typeof(geocoder) === "undefined") {
@@ -148,7 +152,7 @@ GoogleMapLocator = {
     GoogleMapLocator.parseAddressComponents(results[0].address_components);
   },
 
-  parseAddressComponents: function(address_components) {
+  extractAddressComponents: function(address_components) {
     var components = {};
     $(address_components).each(function(idx, e) { 
       var value_short = e.short_name;
@@ -159,7 +163,11 @@ GoogleMapLocator = {
         "value_long": value_long
       };
     });
-    GoogleMapLocator.address_components = components;
+    return components;
+  },
+
+  parseAddressComponents: function(address_components) {
+    GoogleMapLocator.address_components = GoogleMapLocator.extractAddressComponents(address_components);
   },
 
   codePosition: function(position) {
